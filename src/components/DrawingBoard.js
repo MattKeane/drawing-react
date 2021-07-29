@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { io } from 'socket.io-client';
 
 export default function DrawingBoard(props) {
     const canvas = useRef(null);
@@ -6,8 +7,11 @@ export default function DrawingBoard(props) {
     let startX = null;
     let startY = null;
 
+    const socket = io(process.env.REACT_APP_SOCKET_IO_URL);
+
     // get canvas context after component has rendered
     useEffect(() => {
+        console.log(process.env.REACT_APP_SOCKET_IO_URL);
         ctx.current = canvas.current.getContext('2d');
     }, [])
 
@@ -50,16 +54,24 @@ export default function DrawingBoard(props) {
         }
     }
 
+    const handleSubmit = e => {
+        const imgData = canvas.current.toDataURL('image/png');
+        socket.emit('roomImage', imgData, 'react');
+    }
+
     return (
-        <canvas 
-            id="drawingBoard" 
-            height="500px" 
-            width="750px"
-            ref={ canvas }
-            onMouseDown={ handleMouseDown }
-            onMouseMove={ handleMouseMove }
-            onMouseLeave={ handleMouseLeave }
-            onMouseEnter={ handleMouseEnter }
-        />
+        <>
+            <canvas 
+                id="drawingBoard" 
+                height="500px" 
+                width="750px"
+                ref={ canvas }
+                onMouseDown={ handleMouseDown }
+                onMouseMove={ handleMouseMove }
+                onMouseLeave={ handleMouseLeave }
+                onMouseEnter={ handleMouseEnter }
+            />
+            <button onClick={ handleSubmit }>Send</button>
+        </>
     );
 };
