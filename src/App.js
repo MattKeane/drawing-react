@@ -16,7 +16,7 @@ function App() {
     <div className="App" onMouseUp={ handleMouseUp }>
       <h1>Drawing App</h1>
       <DrawingBoard
-        mouseStatus = { mouseStatus }
+        mouseStatus={ mouseStatus }
       />
     </div>
   );

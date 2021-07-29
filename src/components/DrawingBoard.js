@@ -2,13 +2,13 @@ import { useRef, useEffect } from 'react';
 
 export default function DrawingBoard(props) {
     const canvas = useRef(null);
-    let ctx = null;
+    const ctx = useRef(null);
     let startX = null;
     let startY = null;
 
     // get canvas context after component has rendered
     useEffect(() => {
-        ctx = canvas.current.getContext('2d');
+        ctx.current = canvas.current.getContext('2d');
     }, [])
 
     const handleMouseDown = e => {
@@ -21,11 +21,11 @@ export default function DrawingBoard(props) {
     const handleMouseMove = e => {
         const nativeEvent = e.nativeEvent;
         if (props.mouseStatus.drawing) {
-            ctx.beginPath();
-            ctx.moveTo(startX, startY);
-            ctx.lineTo(nativeEvent.offsetX, nativeEvent.offsetY);
-            ctx.lineWidth = 2;
-            ctx.stroke();
+            ctx.current.beginPath();
+            ctx.current.moveTo(startX, startY);
+            ctx.current.lineTo(nativeEvent.offsetX, nativeEvent.offsetY);
+            ctx.current.lineWidth = 2;
+            ctx.current.stroke();
         }
         [startX, startY] = [nativeEvent.offsetX, nativeEvent.offsetY];
     };
@@ -33,11 +33,11 @@ export default function DrawingBoard(props) {
     const handleMouseLeave = e => {
         if (props.mouseStatus.drawing) {
             const nativeEvent = e.nativeEvent;
-            ctx.beginPath();
-            ctx.moveTo(startX.current, startY.current);
-            ctx.lineTo(nativeEvent.offsetX, nativeEvent.offsetY);
-            ctx.lineWidth = 2;
-            ctx.stroke();
+            ctx.current.beginPath();
+            ctx.current.moveTo(startX.current, startY.current);
+            ctx.current.lineTo(nativeEvent.offsetX, nativeEvent.offsetY);
+            ctx.current.lineWidth = 2;
+            ctx.current.stroke();
         }
         props.mouseStatus.drawing = false;
     };
