@@ -2,53 +2,51 @@ import { useRef, useEffect } from 'react';
 
 export default function DrawingBoard(props) {
     const canvas = useRef(null);
-    const ctx = useRef(null);
-    const startX = useRef(null);
-    const startY = useRef(null);
-    // const drawing = useRef(false);
-    // const mouseDown = useRef(false);
+    let ctx = null;
+    let startX = null;
+    let startY = null;
 
     // get canvas context after component has rendered
     useEffect(() => {
-        ctx.current = canvas.current.getContext('2d');
+        ctx = canvas.current.getContext('2d');
     }, [])
 
     const handleMouseDown = e => {
         const nativeEvent = e.nativeEvent;
-        [startX.current, startY.current] = [nativeEvent.offsetX, nativeEvent.offsetY];
-        props.mouseDown.current = true;
-        props.drawing.current = true;
+        [startX, startY] = [nativeEvent.offsetX, nativeEvent.offsetY];
+        props.mouseStatus.down = true;
+        props.mouseStatus.drawing = true;
     };
 
     const handleMouseMove = e => {
         const nativeEvent = e.nativeEvent;
-        if (props.drawing.current) {
-            ctx.current.beginPath();
-            ctx.current.moveTo(startX.current, startY.current);
-            ctx.current.lineTo(nativeEvent.offsetX, nativeEvent.offsetY);
-            ctx.current.lineWidth = 2;
-            ctx.current.stroke();
+        if (props.mouseStatus.drawing) {
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(nativeEvent.offsetX, nativeEvent.offsetY);
+            ctx.lineWidth = 2;
+            ctx.stroke();
         }
-        [startX.current, startY.current] = [nativeEvent.offsetX, nativeEvent.offsetY];
+        [startX, startY] = [nativeEvent.offsetX, nativeEvent.offsetY];
     };
 
     const handleMouseLeave = e => {
-        if (props.drawing.current) {
+        if (props.mouseStatus.drawing) {
             const nativeEvent = e.nativeEvent;
-            ctx.current.beginPath();
-            ctx.current.moveTo(startX.current, startY.current);
-            ctx.current.lineTo(nativeEvent.offsetX, nativeEvent.offsetY);
-            ctx.current.lineWidth = 2;
-            ctx.current.stroke();
+            ctx.beginPath();
+            ctx.moveTo(startX.current, startY.current);
+            ctx.lineTo(nativeEvent.offsetX, nativeEvent.offsetY);
+            ctx.lineWidth = 2;
+            ctx.stroke();
         }
-        props.drawing.current = false;
+        props.mouseStatus.drawing = false;
     };
 
     const handleMouseEnter = e => {
-        if (props.mouseDown.current) {
+        if (props.mouseStatus.down) {
             const nativeEvent = e.nativeEvent;
-            [startX.current, startY.current] = [nativeEvent.offsetX, nativeEvent.offsetY];
-            props.drawing.current = true;
+            [startX, startY] = [nativeEvent.offsetX, nativeEvent.offsetY];
+            props.mouseStatus.drawing = true;
         }
     }
 
