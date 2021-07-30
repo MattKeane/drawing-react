@@ -5,8 +5,8 @@ export default function DrawingBoard(props) {
     const canvas = useRef(null);
     const ctx = useRef(null);
     const socket = useRef(null);
-    let startX = null;
-    let startY = null;
+    let startX = useRef(null);
+    let startY = useRef(null);
 
     // const socket = io(process.env.REACT_APP_SOCKET_IO_URL);
 
@@ -20,11 +20,12 @@ export default function DrawingBoard(props) {
         socket.current = io(process.env.REACT_APP_SOCKET_IO_URL);
     }, []);
 
+    //  manually add touch events (necessary to preventDefault())
     useEffect(() => {    
         const handleTouchStart = e => {
             e.preventDefault();
             const touch = e.touches[0];
-            [startX, startY] = [touch.pageX - e.target.offsetLeft, touch.pageY - e.target.offsetTop];
+            [startX.current, startY.current] = [touch.pageX - e.target.offsetLeft, touch.pageY - e.target.offsetTop];
             props.mouseStatus.down = true;
             props.mouseStatus.drawing = true;
         };
@@ -34,12 +35,12 @@ export default function DrawingBoard(props) {
             const [x, y] = [touch.pageX - e.target.offsetLeft, touch.pageY - e.target.offsetTop];
             if (props.mouseStatus.drawing) {
                 ctx.current.beginPath();
-                ctx.current.moveTo(startX, startY);
+                ctx.current.moveTo(startX.current, startY.current);
                 ctx.current.lineTo(x, y);
                 ctx.current.lineWidth = 2;
                 ctx.current.stroke();
             }
-            [startX, startY] = [x, y];
+            [startX.current, startY.current] = [x, y];
         };
 
         canvas.current.addEventListener('touchstart', handleTouchStart, {passive: false});
@@ -48,7 +49,7 @@ export default function DrawingBoard(props) {
 
     const handleMouseDown = e => {
         const nativeEvent = e.nativeEvent;
-        [startX, startY] = [nativeEvent.offsetX, nativeEvent.offsetY];
+        [startX.current, startY.current] = [nativeEvent.offsetX, nativeEvent.offsetY];
         props.mouseStatus.down = true;
         props.mouseStatus.drawing = true;
     };
@@ -57,12 +58,12 @@ export default function DrawingBoard(props) {
         const nativeEvent = e.nativeEvent;
         if (props.mouseStatus.drawing) {
             ctx.current.beginPath();
-            ctx.current.moveTo(startX, startY);
+            ctx.current.moveTo(startX.current, startY.current);
             ctx.current.lineTo(nativeEvent.offsetX, nativeEvent.offsetY);
             ctx.current.lineWidth = 2;
             ctx.current.stroke();
         }
-        [startX, startY] = [nativeEvent.offsetX, nativeEvent.offsetY];
+        [startX.current, startY.current] = [nativeEvent.offsetX, nativeEvent.offsetY];
     };
 
     const handleMouseLeave = e => {
@@ -80,7 +81,7 @@ export default function DrawingBoard(props) {
     const handleMouseEnter = e => {
         if (props.mouseStatus.down) {
             const nativeEvent = e.nativeEvent;
-            [startX, startY] = [nativeEvent.offsetX, nativeEvent.offsetY];
+            [startX.current, startY.current] = [nativeEvent.offsetX, nativeEvent.offsetY];
             props.mouseStatus.drawing = true;
         }
     }
