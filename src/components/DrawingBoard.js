@@ -45,7 +45,7 @@ export default function DrawingBoard(props) {
 
         canvas.current.addEventListener('touchstart', handleTouchStart, {passive: false});
         canvas.current.addEventListener('touchmove', handleTouchMove, {passive: false});
-    }, []);
+    }, [props.mouseStatus]);
 
     const handleMouseDown = e => {
         const nativeEvent = e.nativeEvent;
