@@ -24,21 +24,22 @@ export default function DrawingBoard(props) {
         const handleTouchStart = e => {
             e.preventDefault();
             const touch = e.touches[0];
-            [startX, startY] = [touch.pageX, touch.pageY];
+            [startX, startY] = [touch.pageX - e.target.offsetLeft, touch.pageY - e.target.offsetTop];
             props.mouseStatus.down = true;
             props.mouseStatus.drawing = true;
         };
         const handleTouchMove = e => {
             e.preventDefault();
             const touch = e.touches[0];
+            const [x, y] = [touch.pageX - e.target.offsetLeft, touch.pageY - e.target.offsetTop];
             if (props.mouseStatus.drawing) {
                 ctx.current.beginPath();
                 ctx.current.moveTo(startX, startY);
-                ctx.current.lineTo(touch.pageX, touch.pageY);
+                ctx.current.lineTo(x, y);
                 ctx.current.lineWidth = 2;
                 ctx.current.stroke();
             }
-            [startX, startY] = [touch.pageX, touch.pageY];
+            [startX, startY] = [x, y];
         };
 
         canvas.current.addEventListener('touchstart', handleTouchStart, {passive: false});
@@ -52,8 +53,6 @@ export default function DrawingBoard(props) {
         props.mouseStatus.drawing = true;
     };
 
-
-
     const handleMouseMove = e => {
         const nativeEvent = e.nativeEvent;
         if (props.mouseStatus.drawing) {
@@ -65,8 +64,6 @@ export default function DrawingBoard(props) {
         }
         [startX, startY] = [nativeEvent.offsetX, nativeEvent.offsetY];
     };
-
-
 
     const handleMouseLeave = e => {
         if (props.mouseStatus.drawing) {
