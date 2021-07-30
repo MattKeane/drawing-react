@@ -15,8 +15,34 @@ export default function DrawingBoard(props) {
         ctx.current = canvas.current.getContext('2d');
     }, []);
 
+    // create socket after component has rendered
     useEffect(() => {
         socket.current = io(process.env.REACT_APP_SOCKET_IO_URL);
+    }, []);
+
+    useEffect(() => {    
+        const handleTouchStart = e => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            [startX, startY] = [touch.pageX, touch.pageY];
+            props.mouseStatus.down = true;
+            props.mouseStatus.drawing = true;
+        };
+        const handleTouchMove = e => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            if (props.mouseStatus.drawing) {
+                ctx.current.beginPath();
+                ctx.current.moveTo(startX, startY);
+                ctx.current.lineTo(touch.pageX, touch.pageY);
+                ctx.current.lineWidth = 2;
+                ctx.current.stroke();
+            }
+            [startX, startY] = [touch.pageX, touch.pageY];
+        };
+
+        canvas.current.addEventListener('touchstart', handleTouchStart, {passive: false});
+        canvas.current.addEventListener('touchmove', handleTouchMove, {passive: false});
     }, []);
 
     const handleMouseDown = e => {
@@ -25,6 +51,8 @@ export default function DrawingBoard(props) {
         props.mouseStatus.down = true;
         props.mouseStatus.drawing = true;
     };
+
+
 
     const handleMouseMove = e => {
         const nativeEvent = e.nativeEvent;
@@ -37,6 +65,8 @@ export default function DrawingBoard(props) {
         }
         [startX, startY] = [nativeEvent.offsetX, nativeEvent.offsetY];
     };
+
+
 
     const handleMouseLeave = e => {
         if (props.mouseStatus.drawing) {
