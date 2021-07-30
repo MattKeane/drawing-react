@@ -4,16 +4,20 @@ import { io } from 'socket.io-client';
 export default function DrawingBoard(props) {
     const canvas = useRef(null);
     const ctx = useRef(null);
+    const socket = useRef(null);
     let startX = null;
     let startY = null;
 
-    const socket = io(process.env.REACT_APP_SOCKET_IO_URL);
+    // const socket = io(process.env.REACT_APP_SOCKET_IO_URL);
 
     // get canvas context after component has rendered
     useEffect(() => {
-        console.log(process.env.REACT_APP_SOCKET_IO_URL);
         ctx.current = canvas.current.getContext('2d');
-    }, [])
+    }, []);
+
+    useEffect(() => {
+        socket.current = io(process.env.REACT_APP_SOCKET_IO_URL);
+    }, []);
 
     const handleMouseDown = e => {
         const nativeEvent = e.nativeEvent;
@@ -56,7 +60,7 @@ export default function DrawingBoard(props) {
 
     const handleSubmit = e => {
         const imgData = canvas.current.toDataURL('image/png');
-        socket.emit('roomImage', imgData, 'react');
+        socket.current.emit('roomImage', imgData, 'react');
     }
 
     return (
